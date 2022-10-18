@@ -90,12 +90,10 @@ export const spec = {
     for (let i = 0; i < validBidRequests.length; i++) {
       const bidReq = validBidRequests[i]
       const media = bidReq.mediaTypes
-      const sizes = media.banner.sizes[0]
       const imp = {
         id: bidReq.bidId,
         banner: {
-          w: sizes[0],
-          h: sizes[1],
+          format: media.banner.sizes.map(s => { return { w: s[0], h: s[1] } })
         },
         video: media.video,
         audio: media.audio,
