@@ -7,7 +7,7 @@ const BIDDER_CODE = 'adcamp'
 const TEST = false
 
 const PARAM_HOST = 'host'
-const PARAM_PUBLISHER = 'publisher'
+const PARAM_PUBLISHER = 'publisherId'
 
 function getBidFloor(bid) {
   if (!isFn(bid.getFloor)) {
@@ -31,12 +31,12 @@ function getBidFloor(bid) {
 function getParam(bid, param) {
   const {
     host,
-    publisher,
+    publisherId,
   } = bid.params
 
   let map = new Object()
   map[PARAM_HOST] = host
-  map[PARAM_PUBLISHER] = publisher
+  map[PARAM_PUBLISHER] = publisherId
 
   return map[param]
 }
@@ -80,17 +80,24 @@ export const spec = {
       bapp: rtb.bapp,
       source: rtb.source,
       regs: rtb.regs,
+      ext: {
+        mediaType: 0,
+      },
     }
 
-    req.site.publisher = getParam(validBidRequests[0], PARAM_PUBLISHER)
+    req.site.publisher = { id: getParam(validBidRequests[0], PARAM_PUBLISHER) }
     let impressions = []
     for (let i = 0; i < validBidRequests.length; i++) {
       const bidReq = validBidRequests[i]
       const media = bidReq.mediaTypes
+      const sizes = media.banner.sizes[0]
       const imp = {
         id: bidReq.bidId,
-        banner: media.banner,
-        vider: media.video,
+        banner: {
+          w: sizes[0],
+          h: sizes[1],
+        },
+        video: media.video,
         audio: media.audio,
         native: media.native,
         // pmp:
@@ -111,10 +118,16 @@ export const spec = {
       impressions.push(imp)
     }
 
+    req.imp = impressions
+    logInfo(req)
     return [{
       method: 'POST',
       url: url,
       data: req,
+      options: {
+        withCredentials: false,
+        crossOrigin: true,
+      },
     }]
   },
 
