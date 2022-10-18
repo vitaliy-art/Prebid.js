@@ -62,7 +62,7 @@ export const spec = {
         url: getEnpoint(bidRequest),
         data: payload,
         options: {
-          withCredentials: true,
+          // withCredentials: true,
           crossOrigin: true
         },
         bidRequest: bidRequest
